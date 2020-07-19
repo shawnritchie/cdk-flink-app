@@ -1,0 +1,108 @@
+buildscript {
+    repositories {
+        jcenter() // this applies only to the Gradle 'Shadow' plugin
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+    }
+}
+
+plugins {
+    id 'java'
+    id 'application'
+    id "com.github.johnrengelman.shadow" version "6.0.0"
+}
+
+group 'com.payment.digestor'
+version '1.0-SNAPSHOT'
+mainClassName = 'com.payment.digestor.Application'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+ext {
+    javaVersion = '1.8'
+    flinkVersion = '1.8.2'
+    kdaVersion = '1.1.0'
+    scalaBinaryVersion = '2.11'
+    lombokVersion = '1.18.12'
+    junitVersion = '4.12'
+    jacksonVersion = '2.9.8'
+}
+
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+applicationDefaultJvmArgs = ["-Dlog4j.configurationFile=log4j.properties"]
+
+configurations {
+    flinkShadowJar // dependencies which go into the shadowJar
+    dependencies {
+        flinkShadowJar "com.amazonaws:aws-kinesisanalytics-runtime:$kdaVersion"
+        flinkShadowJar "com.amazonaws:aws-kinesisanalytics-flink:$kdaVersion"
+        flinkShadowJar "org.apache.flink:flink-connector-kinesis_$scalaBinaryVersion:$flinkVersion"
+        flinkShadowJar "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    }
+
+    // always exclude these (also from transitive dependencies) since they are provided by Flink
+    flinkShadowJar.exclude group: 'org.apache.flink', module: 'force-shading'
+    flinkShadowJar.exclude group: 'com.google.code.findbugs', module: 'jsr305'
+    flinkShadowJar.exclude group: 'org.slf4j'
+    flinkShadowJar.exclude group: 'org.apache.logging.log4j'
+}
+
+dependencies {
+    compile "com.amazonaws:aws-kinesisanalytics-runtime:$kdaVersion"
+    compile "com.amazonaws:aws-kinesisanalytics-flink:$kdaVersion"
+    compile "org.apache.flink:flink-connector-kinesis_$scalaBinaryVersion:$flinkVersion"
+
+    //Apache Flink dependencies
+    compileOnly "org.apache.flink:flink-java:$flinkVersion"
+    compileOnly "org.apache.flink:flink-streaming-java_$scalaBinaryVersion:$flinkVersion"
+
+    //Application dependencies
+    compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+
+    //Lombok dependencies
+    compileOnly "org.projectlombok:lombok:$lombokVersion"
+    annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+
+    //Test dependencies
+    testCompileOnly "org.projectlombok:lombok:$lombokVersion"
+    testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
+
+    testCompile "junit:junit:$junitVersion"
+
+    testCompile "org.apache.flink:flink-test-utils_$scalaBinaryVersion:1.11.0"
+//    testCompile "org.apache.flink:flink-runtime_$scalaBinaryVersion:1.11.0:tests"
+//    testCompile "org.apache.flink:flink-streaming-java_$scalaBinaryVersion:1.11.0:tests"
+    testCompile "org.mockito:mockito-all:1.10.19"
+}
+
+// make compileOnly dependencies available for tests:
+sourceSets {
+    main.compileClasspath += configurations.flinkShadowJar
+    main.runtimeClasspath += configurations.flinkShadowJar
+
+    test.compileClasspath += configurations.flinkShadowJar
+    test.runtimeClasspath += configurations.flinkShadowJar
+
+    javadoc.classpath += configurations.flinkShadowJar
+}
+
+run.classpath = sourceSets.main.runtimeClasspath
+
+jar {
+    manifest {
+        attributes 'Build-Jdk': System.getProperty('java.version')
+    }
+}
+
+shadowJar {
+    configurations = [project.configurations.flinkShadowJar]
+}
