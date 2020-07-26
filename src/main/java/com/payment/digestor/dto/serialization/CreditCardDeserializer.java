@@ -5,27 +5,29 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import com.payment.digestor.dto.PaymentSummary;
+import com.payment.digestor.dto.CreditCard;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
-public class PaymentSummaryDeserializer extends StdDeserializer<PaymentSummary> {
+@Slf4j
+public class CreditCardDeserializer extends StdDeserializer<CreditCard> {
 
     ObjectMapper mapper = new ObjectMapper();
 
-    public PaymentSummaryDeserializer() {
+    public CreditCardDeserializer() {
         this(null);
     }
 
-    protected PaymentSummaryDeserializer(Class<?> vc) {
+    protected CreditCardDeserializer(Class<?> vc) {
         super(vc);
     }
 
     @Override
-    public PaymentSummary deserialize(JsonParser jsonParser,
-                                      DeserializationContext deserializationContext)
+    public CreditCard deserialize(JsonParser jsonParser,
+                                  DeserializationContext deserializationContext)
             throws IOException, JsonProcessingException {
-        return mapper.readValue(jsonParser.getText(), PaymentSummary.class);
+        return mapper.readValue(jsonParser.getText(), CreditCard.class);
     }
 
 }

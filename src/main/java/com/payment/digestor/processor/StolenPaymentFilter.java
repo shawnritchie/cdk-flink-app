@@ -9,6 +9,6 @@ public class StolenPaymentFilter implements FilterFunction<PaymentEvent> {
     @Override
     public boolean filter(PaymentEvent paymentEvent) {
         log.error("PROCESSING STOLEN CARD");
-        return paymentEvent.getPaymentMethod().getCardState().equals("STOLEN");
+        return paymentEvent.getTransaction().getCreditCard().getCardState().equals("STOLEN");
     }
 }

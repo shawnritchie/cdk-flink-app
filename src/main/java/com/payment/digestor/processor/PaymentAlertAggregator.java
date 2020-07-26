@@ -17,14 +17,11 @@ public class PaymentAlertAggregator implements AggregateFunction<PaymentAlert, P
 
     @Override
     public PaymentSummary add(PaymentAlert paymentAlert, PaymentSummary paymentSummary) {
-        if (paymentSummary.getPaymentMethod() == null) {
-            paymentSummary.setPaymentMethod(paymentAlert.getPaymentMethod());
+        if (paymentSummary.getCreditCard() == null) {
+            paymentSummary.setCreditCard(paymentAlert.getTransaction().getCreditCard());
         }
-        BigInteger deposited = paymentAlert.getPaymentMethod().getPaymentAmount() == null
-                ? BigInteger.TEN.multiply(BigInteger.TEN)
-                : paymentAlert.getPaymentMethod().getPaymentAmount();
 
-        paymentSummary.aggregateDeposit(deposited);
+        paymentSummary.aggregateDeposit(paymentAlert.getTransaction().getAmountInCents());
         return paymentSummary;
     }
 
@@ -38,7 +35,7 @@ public class PaymentAlertAggregator implements AggregateFunction<PaymentAlert, P
     @Override
     public PaymentSummary merge(PaymentSummary paymentSummary, PaymentSummary acc1) {
         return new PaymentSummary(
-                paymentSummary.getPaymentMethod() != null ? paymentSummary.getPaymentMethod() : acc1.getPaymentMethod(),
+                paymentSummary.getCreditCard() != null ? paymentSummary.getCreditCard() : acc1.getCreditCard(),
                 paymentSummary.getNumberOfDeposits().add(acc1.getNumberOfDeposits()),
                 paymentSummary.getTotalDeposits().add(acc1.getTotalDeposits()));
     }

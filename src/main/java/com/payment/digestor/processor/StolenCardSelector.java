@@ -6,6 +6,6 @@ import org.apache.flink.api.java.functions.KeySelector;
 public class StolenCardSelector implements KeySelector<PaymentAlert, String> {
     @Override
     public String getKey(PaymentAlert paymentAlert) {
-        return paymentAlert.getPaymentMethod().getCardNumber();
+        return paymentAlert.getTransaction().getCreditCard().getCardNumber();
     }
 }

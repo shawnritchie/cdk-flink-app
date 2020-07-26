@@ -15,7 +15,7 @@ public class PaymentAlertProcessWindow extends ProcessAllWindowFunction<PaymentE
             throws Exception {
         iterable.forEach(paymentEvent -> {
             log.error("CREATING PAYMENT ALERT");
-            PaymentAlert paymentAlert = new PaymentAlert(paymentEvent.getPaymentMethod());
+            PaymentAlert paymentAlert = new PaymentAlert(paymentEvent.getTransaction());
             paymentAlert.setEventCreated(paymentEvent.getEventCreated());
             collector.collect(paymentAlert);
         });

@@ -12,9 +12,9 @@ import java.time.LocalTime;
 
 public class SerializationTest {
 
-    private static final String PAYMENT_EVENT_STRING = "{\"event_created\": \"2020-07-18 09:02:10\", \"event_type\": \"PAYMENT_EVENT\", \"event_json_data\": \"{\\\"card_type\\\": \\\"Mastercard\\\", \\\"card_owner\\\": \\\"Renee Garner\\\", \\\"card_number\\\": \\\"2502895861855452\\\", \\\"card_cvc\\\": \\\"01/28\\\", \\\"card_state\\\": \\\"LEGIT\\\"}\"}";
-    private static final String PAYMENT_ALERT_STRING = "{\"event_created\": \"2020-07-18 09:02:10\", \"event_type\": \"PAYMENT_ALERT\", \"event_json_data\": \"{\\\"card_type\\\": \\\"Mastercard\\\", \\\"card_owner\\\": \\\"Renee Garner\\\", \\\"card_number\\\": \\\"2502895861855452\\\", \\\"card_cvc\\\": \\\"01/28\\\", \\\"card_state\\\": \\\"STOLEN\\\"}\"}";
-    private static final String PAYMENT_ALERT_SUMMARY_STRING = "{\"event_created\": \"2020-07-18 09:02:10\", \"event_type\": \"PAYMENT_ALERT_SUMMARY\", \"event_json_data\": \"{\\\"number_of_deposits\\\": 10, \\\"total_deposits_in_cents\\\": 10000, \\\"payment_method\\\": {\\\"card_type\\\": \\\"Mastercard\\\", \\\"card_owner\\\": \\\"Renee Garner\\\", \\\"card_number\\\": \\\"2502895861855452\\\", \\\"card_cvc\\\": \\\"01/28\\\", \\\"card_state\\\": \\\"STOLEN\\\"}}\"}";
+    private static final String PAYMENT_EVENT_STRING = "{\"event_created\": \"2020-07-18 09:02:10\", \"event_type\": \"PAYMENT_EVENT\", \"event_json_data\": \"{\\\"tx_id\\\": \\\"eb77162ef3644cf1bacee1dbad66c5fd\\\", \\\"tx_amount_cents\\\": 5000, \\\"tx_currency\\\": \\\"EUR\\\", \\\"credit_card\\\": {\\\"card_type\\\": \\\"Mastercard\\\", \\\"card_owner\\\": \\\"Renee Garner\\\", \\\"card_number\\\": \\\"2502895861855452\\\", \\\"card_cvc\\\": \\\"01/28\\\", \\\"card_state\\\": \\\"LEGIT\\\"}}\"}";
+    private static final String PAYMENT_ALERT_STRING = "{\"event_created\": \"2020-07-18 09:02:10\", \"event_type\": \"PAYMENT_ALERT\", \"event_json_data\": \"{\\\"tx_id\\\": \\\"eb77162ef3644cf1bacee1dbad66c5fd\\\", \\\"tx_amount_cents\\\": 5000, \\\"tx_currency\\\": \\\"EUR\\\", \\\"credit_card\\\": {\\\"card_type\\\": \\\"Mastercard\\\", \\\"card_owner\\\": \\\"Renee Garner\\\", \\\"card_number\\\": \\\"2502895861855452\\\", \\\"card_cvc\\\": \\\"01/28\\\", \\\"card_state\\\": \\\"STOLEN\\\"}}\"}";
+    private static final String PAYMENT_ALERT_SUMMARY_STRING = "{\"event_created\": \"2020-07-18 09:02:10\", \"event_type\": \"PAYMENT_ALERT_SUMMARY\", \"event_json_data\": \"{\\\"number_of_tx\\\": 10, \\\"total_tx_in_cents\\\": 10000, \\\"credit_card\\\": {\\\"card_type\\\": \\\"Mastercard\\\", \\\"card_owner\\\": \\\"Renee Garner\\\", \\\"card_number\\\": \\\"2502895861855452\\\", \\\"card_cvc\\\": \\\"01/28\\\", \\\"card_state\\\": \\\"STOLEN\\\"}}\"}";
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @Test
@@ -32,12 +32,19 @@ public class SerializationTest {
                         LocalDate.of(2020, 07, 18),
                         LocalTime.of(9, 2, 10)));
 
-        Assert.assertNotNull(paymentEvent.getPaymentMethod());
-        Assert.assertEquals("Mastercard", paymentEvent.getPaymentMethod().getCardType());
-        Assert.assertEquals("Renee Garner", paymentEvent.getPaymentMethod().getCardOwner());
-        Assert.assertEquals("2502895861855452", paymentEvent.getPaymentMethod().getCardNumber());
-        Assert.assertEquals("01/28", paymentEvent.getPaymentMethod().getCardCVC());
-        Assert.assertEquals("LEGIT", paymentEvent.getPaymentMethod().getCardState());
+        Transaction tx = paymentEvent.getTransaction();
+        Assert.assertNotNull(tx);
+        Assert.assertEquals("eb77162ef3644cf1bacee1dbad66c5fd", tx.getId());
+        Assert.assertEquals(BigInteger.valueOf(5000l), tx.getAmountInCents());
+        Assert.assertEquals("EUR", tx.getCurrency());
+
+        CreditCard cc = paymentEvent.getTransaction().getCreditCard();
+        Assert.assertNotNull(cc);
+        Assert.assertEquals("Mastercard", cc.getCardType());
+        Assert.assertEquals("Renee Garner", cc.getCardOwner());
+        Assert.assertEquals("2502895861855452", cc.getCardNumber());
+        Assert.assertEquals("01/28", cc.getCardCVC());
+        Assert.assertEquals("LEGIT", cc.getCardState());
     }
 
     @Test
@@ -55,12 +62,19 @@ public class SerializationTest {
                         LocalDate.of(2020, 07, 18),
                         LocalTime.of(9, 2, 10)));
 
-        Assert.assertNotNull(paymentAlert.getPaymentMethod());
-        Assert.assertEquals("Mastercard", paymentAlert.getPaymentMethod().getCardType());
-        Assert.assertEquals("Renee Garner", paymentAlert.getPaymentMethod().getCardOwner());
-        Assert.assertEquals("2502895861855452", paymentAlert.getPaymentMethod().getCardNumber());
-        Assert.assertEquals("01/28", paymentAlert.getPaymentMethod().getCardCVC());
-        Assert.assertEquals("STOLEN", paymentAlert.getPaymentMethod().getCardState());
+        Transaction tx = paymentAlert.getTransaction();
+        Assert.assertNotNull(tx);
+        Assert.assertEquals("eb77162ef3644cf1bacee1dbad66c5fd", tx.getId());
+        Assert.assertEquals(BigInteger.valueOf(5000l), tx.getAmountInCents());
+        Assert.assertEquals("EUR", tx.getCurrency());
+
+        CreditCard cc = paymentAlert.getTransaction().getCreditCard();
+        Assert.assertNotNull(cc);
+        Assert.assertEquals("Mastercard", cc.getCardType());
+        Assert.assertEquals("Renee Garner", cc.getCardOwner());
+        Assert.assertEquals("2502895861855452", cc.getCardNumber());
+        Assert.assertEquals("01/28", cc.getCardCVC());
+        Assert.assertEquals("STOLEN", cc.getCardState());
     }
 
     @Test
@@ -82,13 +96,13 @@ public class SerializationTest {
         Assert.assertEquals(BigInteger.TEN, PaymentAlertSummary.getPaymentSummary().getNumberOfDeposits());
         Assert.assertEquals(BigInteger.valueOf(10000), PaymentAlertSummary.getPaymentSummary().getTotalDeposits());
 
-        Assert.assertNotNull(PaymentAlertSummary.getPaymentSummary().getPaymentMethod());
-        PaymentMethod paymentMethod = PaymentAlertSummary.getPaymentSummary().getPaymentMethod();
-        Assert.assertEquals("Mastercard", paymentMethod.getCardType());
-        Assert.assertEquals("Renee Garner", paymentMethod.getCardOwner());
-        Assert.assertEquals("2502895861855452", paymentMethod.getCardNumber());
-        Assert.assertEquals("01/28", paymentMethod.getCardCVC());
-        Assert.assertEquals("STOLEN", paymentMethod.getCardState());
+        Assert.assertNotNull(PaymentAlertSummary.getPaymentSummary().getCreditCard());
+        CreditCard creditCard = PaymentAlertSummary.getPaymentSummary().getCreditCard();
+        Assert.assertEquals("Mastercard", creditCard.getCardType());
+        Assert.assertEquals("Renee Garner", creditCard.getCardOwner());
+        Assert.assertEquals("2502895861855452", creditCard.getCardNumber());
+        Assert.assertEquals("01/28", creditCard.getCardCVC());
+        Assert.assertEquals("STOLEN", creditCard.getCardState());
 
     }
 }

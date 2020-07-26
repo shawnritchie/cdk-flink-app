@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.payment.digestor.dto.serialization.JsonSerializer;
-import com.payment.digestor.dto.serialization.PaymentMethodDeserializer;
+import com.payment.digestor.dto.serialization.TransactionDeserializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,6 +15,6 @@ import lombok.EqualsAndHashCode;
 public class PaymentEvent extends PaymentWrapper {
     @JsonProperty("event_json_data")
     @JsonSerialize(using = JsonSerializer.class)
-    @JsonDeserialize(using = PaymentMethodDeserializer.class)
-    PaymentMethod paymentMethod;
+    @JsonDeserialize(using = TransactionDeserializer.class)
+    Transaction transaction;
 }

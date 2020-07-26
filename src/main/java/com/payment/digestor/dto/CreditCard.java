@@ -3,10 +3,8 @@ package com.payment.digestor.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;
 
-import java.math.BigInteger;
-
 @Value
-public class PaymentMethod {
+public class CreditCard {
     @JsonProperty("card_type")
     String cardType;
     @JsonProperty("card_owner")
@@ -17,6 +15,4 @@ public class PaymentMethod {
     String cardCVC;
     @JsonProperty("card_state")
     String cardState;
-    @JsonProperty("payment_amount")
-    BigInteger paymentAmount;
 }

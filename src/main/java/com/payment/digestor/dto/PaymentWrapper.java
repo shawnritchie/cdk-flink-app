@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.payment.digestor.dto.serialization.CustomDateDeserializer;
 import com.payment.digestor.dto.serialization.CustomLocalDateTimeSerializer;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;

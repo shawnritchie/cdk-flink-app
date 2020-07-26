@@ -9,11 +9,11 @@ import java.math.BigInteger;
 @Data
 @AllArgsConstructor
 public class PaymentSummary {
-    @JsonProperty("payment_method")
-    PaymentMethod paymentMethod;
-    @JsonProperty("number_of_deposits")
+    @JsonProperty("credit_card")
+    CreditCard creditCard;
+    @JsonProperty("number_of_tx")
     BigInteger numberOfDeposits;
-    @JsonProperty("total_deposits_in_cents")
+    @JsonProperty("total_tx_in_cents")
     BigInteger totalDeposits;
 
     public void aggregateDeposit(BigInteger depositAmount) {
